@@ -19,10 +19,6 @@ body {
 .header {
   text-align: center;
 }
-.header img {
-  max-width: 140px;
-  margin-bottom: 10px;
-}
 h1 {
   font-size: 20px;
 }
@@ -68,9 +64,6 @@ button:disabled {
 <div class="container">
 
   <div class="header">
-    <!-- Optional logo -->
-    <!-- <img src="image.jpg" alt="Eluyefa Chambers"> -->
-
     <h1>
       Petition & Allegation Submission against Dr Ifeanyi Onukwubiri<br>
       <small>TMT Travels and Tours Limited</small>
@@ -79,11 +72,10 @@ button:disabled {
 
   <div class="notice">
     This form is provided for victims to submit details of payments made to
-    <strong>TMT Travels and Tours Limited</strong> in relation to alleged
-    visa and travel service fraud.
+    <strong>TMT Travels and Tours Limited</strong>.
   </div>
 
-  <form id="petitionForm">
+  <form id="petitionForm" enctype="multipart/form-data">
 
     <label>Full Name *</label>
     <input type="text" name="full_name" required>
@@ -103,8 +95,8 @@ button:disabled {
     <label>Account Number Paid Into</label>
     <input type="text" name="account_number">
 
-    <label>Upload Proof of Payment (bank slip, receipt, screenshots)</label>
-    <input type="file" id="proof" multiple required>
+    <label>Upload Proof of Payment</label>
+    <input type="file" name="proof" multiple required>
 
     <button type="submit">Submit Allegation</button>
   </form>
@@ -114,71 +106,34 @@ button:disabled {
 </div>
 
 <script>
-document.getElementById("petitionForm").addEventListener("submit", async function(e) {
+document.getElementById("petitionForm").addEventListener("submit", function(e) {
   e.preventDefault();
 
   const btn = this.querySelector("button");
   btn.textContent = "Submitting...";
   btn.disabled = true;
 
-  const form = this;
-  const formData = new FormData();
+  const formData = new FormData(this);
 
-  // Append normal inputs
-  [...form.elements].forEach(el => {
-    if (el.name && el.type !== "file") {
-      formData.append(el.name, el.value);
+  fetch(
+    "https://script.google.com/macros/s/AKfycbyBG0T-auDWh_a8EU7G7iIrKWEuLCxv11Jzbfnsa7yJCA-_QmeR2uofjyBDzYT3QzkV/exec",
+    {
+      method: "POST",
+      body: formData,
+      mode: "no-cors"
     }
-  });
-
-  // Convert files to Base64
-  const files = document.getElementById("proof").files;
-  const filePromises = [];
-
-  for (let file of files) {
-    filePromises.push(new Promise(resolve => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        resolve({
-          name: file.name,
-          type: file.type,
-          data: reader.result.split(",")[1]
-        });
-      };
-      reader.readAsDataURL(file);
-    }));
-  }
-
-  const encodedFiles = await Promise.all(filePromises);
-  formData.append("files", JSON.stringify(encodedFiles));
-
-  try {
-    const res = await fetch(
-      "https://script.google.com/macros/s/AKfycbyBG0T-auDWh_a8EU7G7iIrKWEuLCxv11Jzbfnsa7yJCA-_QmeR2uofjyBDzYT3QzkV/execs",
-      {
-        method: "POST",
-        body: formData
-      }
-    );
-
-    const data = await res.json();
-
-    if (data.success) {
-      form.reset();
-      const msg = document.getElementById("successMessage");
-      msg.classList.remove("hidden");
-      msg.innerHTML =
-        "<strong>Submission successful.</strong><br>Your allegation has been received for legal review.";
-    } else {
-      alert("Submission failed. Please try again.");
-    }
-
-  } catch (err) {
-    alert("Submission failed or timed out. Please try again.");
-  } finally {
+  ).then(() => {
+    this.reset();
+    const msg = document.getElementById("successMessage");
+    msg.classList.remove("hidden");
+    msg.innerHTML =
+      "<strong>Submission successful.</strong><br>Your allegation has been received for legal review.";
+  }).catch(() => {
+    alert("Submission failed. Please try again.");
+  }).finally(() => {
     btn.textContent = "Submit Allegation";
     btn.disabled = false;
-  }
+  });
 });
 </script>
 
