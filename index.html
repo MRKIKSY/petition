@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Petition Submission – Eluyefa Chambers</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+    }
+    .container {
+      max-width: 700px;
+      background: #fff;
+      margin: 40px auto;
+      padding: 25px;
+      border-radius: 8px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .header img {
+      max-width: 140px;
+      margin-bottom: 10px;
+    }
+    h1 {
+      font-size: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+    }
+    button {
+      background: #000;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    button:disabled {
+      background: #777;
+    }
+    .notice {
+      font-size: 14px;
+      background: #eee;
+      padding: 12px;
+      margin-bottom: 20px;
+    }
+    .hidden {
+      display: none;
+    }
+    #successMessage {
+      margin-top: 20px;
+      padding: 15px;
+      background: #e6ffe6;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <img src="image.jpg" alt="Eluyefa Chambers">
+    <h1>
+      Petition & Allegation Submission against Dr Ifeanyi Onukwubiri<br>
+      <small>TMT Travels and Tours Limited</small>
+    </h1>
+  </div>
+
+  <p class="notice">
+    This form is for victims to submit details of payments made to
+    <strong>TMT Travels and Tours Limited</strong> in relation to alleged
+    visa and travel service fraud.
+  </p>
+
+  <form id="petitionForm" enctype="multipart/form-data">
+
+    <label>Full Name *</label>
+    <input type="text" name="full_name" required>
+
+    <label>Email Address *</label>
+    <input type="email" name="email" required>
+
+    <label>Phone Number *</label>
+    <input type="tel" name="phone" required>
+
+    <label>Date of Payment *</label>
+    <input type="date" name="payment_date" required>
+
+    <label>Account Name Paid Into</label>
+    <input type="text" name="account_name">
+
+    <label>Account Number Paid Into</label>
+    <input type="text" name="account_number">
+
+    <label>Upload Proof of Payment (multiple allowed) *</label>
+    <input type="file" name="proof" multiple required>
+
+    <button type="submit">Submit Allegation</button>
+  </form>
+
+  <div id="successMessage" class="hidden"></div>
+
+</div>
+
+<script>
+document.getElementById("petitionForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+  const btn = this.querySelector("button");
+  btn.textContent = "Submitting...";
+  btn.disabled = true;
+
+  const formData = new FormData(this);
+
+  try {
+    const res = await fetch("/submit", { method: "POST", body: formData });
+    const data = await res.json();
+
+    if (data.success) {
+      this.reset();
+      document.getElementById("successMessage").classList.remove("hidden");
+      document.getElementById("successMessage").innerHTML =
+        "<strong>Submission successful.</strong><br>Your allegation has been received for legal review.";
+    } else {
+      alert("Submission failed.");
+    }
+  } catch {
+    alert("Server error.");
+  } finally {
+    btn.textContent = "Submit Allegation";
+    btn.disabled = false;
+  }
+});
+</script>
+
+</body>
+</html>
