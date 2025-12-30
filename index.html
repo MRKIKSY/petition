@@ -68,7 +68,7 @@ button:disabled {
 <div class="container">
 
   <div class="header">
-    <!-- Upload image.jpg OR comment this out -->
+    <!-- Optional logo -->
     <!-- <img src="image.jpg" alt="Eluyefa Chambers"> -->
 
     <h1>
@@ -78,7 +78,7 @@ button:disabled {
   </div>
 
   <div class="notice">
-    This form is for victims to submit details of payments made to
+    This form is provided for victims to submit details of payments made to
     <strong>TMT Travels and Tours Limited</strong> in relation to alleged
     visa and travel service fraud.
   </div>
@@ -103,7 +103,7 @@ button:disabled {
     <label>Account Number Paid Into</label>
     <input type="text" name="account_number">
 
-    <label>Upload Proof of Payment (max 10MB total)</label>
+    <label>Upload Proof of Payment (bank slip, receipt, screenshots)</label>
     <input type="file" name="proof" multiple required>
 
     <button type="submit">Submit Allegation</button>
@@ -127,18 +127,22 @@ document.getElementById("petitionForm").addEventListener("submit", async functio
   setTimeout(() => controller.abort(), 25000);
 
   try {
-    const res = await fetch("/submit", {
-      method: "POST",
-      body: formData,
-      signal: controller.signal
-    });
+    const res = await fetch(
+      "https://script.google.com/macros/s/AKfycbyBG0T-auDWh_a8EU7G7iIrKWEuLCxv11Jzbfnsa7yJCA-_QmeR2uofjyBDzYT3QzkV/exec",
+      {
+        method: "POST",
+        body: formData,
+        signal: controller.signal
+      }
+    );
 
     const data = await res.json();
 
     if (data.success) {
       this.reset();
-      document.getElementById("successMessage").classList.remove("hidden");
-      document.getElementById("successMessage").innerHTML =
+      const msg = document.getElementById("successMessage");
+      msg.classList.remove("hidden");
+      msg.innerHTML =
         "<strong>Submission successful.</strong><br>Your allegation has been received for legal review.";
     } else {
       alert("Submission failed. Please check your details.");
