@@ -83,7 +83,7 @@ button:disabled {
     visa and travel service fraud.
   </div>
 
-  <form id="petitionForm" enctype="multipart/form-data">
+  <form id="petitionForm">
 
     <label>Full Name *</label>
     <input type="text" name="full_name" required>
@@ -104,7 +104,7 @@ button:disabled {
     <input type="text" name="account_number">
 
     <label>Upload Proof of Payment (bank slip, receipt, screenshots)</label>
-    <input type="file" name="proof" multiple required>
+    <input type="file" id="proof" multiple required>
 
     <button type="submit">Submit Allegation</button>
   </form>
@@ -121,31 +121,56 @@ document.getElementById("petitionForm").addEventListener("submit", async functio
   btn.textContent = "Submitting...";
   btn.disabled = true;
 
-  const formData = new FormData(this);
+  const form = this;
+  const formData = new FormData();
 
-  const controller = new AbortController();
-  setTimeout(() => controller.abort(), 25000);
+  // Append normal inputs
+  [...form.elements].forEach(el => {
+    if (el.name && el.type !== "file") {
+      formData.append(el.name, el.value);
+    }
+  });
+
+  // Convert files to Base64
+  const files = document.getElementById("proof").files;
+  const filePromises = [];
+
+  for (let file of files) {
+    filePromises.push(new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        resolve({
+          name: file.name,
+          type: file.type,
+          data: reader.result.split(",")[1]
+        });
+      };
+      reader.readAsDataURL(file);
+    }));
+  }
+
+  const encodedFiles = await Promise.all(filePromises);
+  formData.append("files", JSON.stringify(encodedFiles));
 
   try {
     const res = await fetch(
       "https://script.google.com/macros/s/AKfycbyBG0T-auDWh_a8EU7G7iIrKWEuLCxv11Jzbfnsa7yJCA-_QmeR2uofjyBDzYT3QzkV/exec",
       {
         method: "POST",
-        body: formData,
-        signal: controller.signal
+        body: formData
       }
     );
 
     const data = await res.json();
 
     if (data.success) {
-      this.reset();
+      form.reset();
       const msg = document.getElementById("successMessage");
       msg.classList.remove("hidden");
       msg.innerHTML =
         "<strong>Submission successful.</strong><br>Your allegation has been received for legal review.";
     } else {
-      alert("Submission failed. Please check your details.");
+      alert("Submission failed. Please try again.");
     }
 
   } catch (err) {
