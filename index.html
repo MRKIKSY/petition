@@ -16,11 +16,9 @@ body {
   padding: 25px;
   border-radius: 8px;
 }
-.header {
-  text-align: center;
-}
 h1 {
   font-size: 20px;
+  text-align: center;
 }
 .notice {
   background: #eee;
@@ -63,45 +61,43 @@ button:disabled {
 
 <div class="container">
 
-  <div class="header">
-    <h1>
-      Petition & Allegation Submission against Dr Ifeanyi Onukwubiri<br>
-      <small>TMT Travels and Tours Limited</small>
-    </h1>
-  </div>
+<h1>
+Petition & Allegation Submission against Dr Ifeanyi Onukwubiri<br>
+<small>TMT Travels and Tours Limited</small>
+</h1>
 
-  <div class="notice">
-    This form is provided for victims to submit details of payments made to
-    <strong>TMT Travels and Tours Limited</strong>.
-  </div>
+<div class="notice">
+This form is provided for victims to submit details of payments made to
+<strong>TMT Travels and Tours Limited</strong>.
+</div>
 
-  <form id="petitionForm" enctype="multipart/form-data">
+<form id="petitionForm" enctype="multipart/form-data">
 
-    <label>Full Name *</label>
-    <input type="text" name="full_name" required>
+<label>Full Name *</label>
+<input type="text" name="full_name" required>
 
-    <label>Email Address *</label>
-    <input type="email" name="email" required>
+<label>Email *</label>
+<input type="email" name="email" required>
 
-    <label>Phone Number *</label>
-    <input type="tel" name="phone" required>
+<label>Phone *</label>
+<input type="tel" name="phone" required>
 
-    <label>Date of Payment *</label>
-    <input type="date" name="payment_date" required>
+<label>Date of Payment *</label>
+<input type="date" name="payment_date" required>
 
-    <label>Account Name Paid Into</label>
-    <input type="text" name="account_name">
+<label>Account Name</label>
+<input type="text" name="account_name">
 
-    <label>Account Number Paid Into</label>
-    <input type="text" name="account_number">
+<label>Account Number</label>
+<input type="text" name="account_number">
 
-    <label>Upload Proof of Payment</label>
-    <input type="file" name="proof" multiple required>
+<label>Upload Proof of Payment</label>
+<input type="file" name="proof" multiple required>
 
-    <button type="submit">Submit Allegation</button>
-  </form>
+<button type="submit">Submit Allegation</button>
+</form>
 
-  <div id="successMessage" class="hidden"></div>
+<div id="successMessage" class="hidden"></div>
 
 </div>
 
