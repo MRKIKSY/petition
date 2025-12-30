@@ -11,8 +11,14 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
+# ===============================
+# CONFIG
+# ===============================
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+# 10MB upload limit (VERY IMPORTANT)
+app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
 
 EMAIL_USER = os.getenv("EMAIL_USER")
 EMAIL_PASS = os.getenv("EMAIL_PASS")
@@ -27,10 +33,17 @@ def home():
     return send_from_directory(".", "index.html")
 
 
+@app.route("/favicon.ico")
+def favicon():
+    return "", 204
+
+
 # ===============================
-# EMAIL SENDER
+# EMAIL FUNCTION
 # ===============================
 def send_email(data, attachments, ip):
+    print("📧 Preparing email...")
+
     msg = EmailMessage()
     msg["Subject"] = "NEW PETITION SUBMISSION – TMT Travels (Allegation)"
     msg["From"] = EMAIL_USER
@@ -63,9 +76,12 @@ for legal review by Eluyefa Chambers on behalf of Mr Scott Iguma.
                 filename=file_info["original_name"]
             )
 
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+    # SMTP TIMEOUT FIX (CRITICAL)
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=20) as smtp:
         smtp.login(EMAIL_USER, EMAIL_PASS)
         smtp.send_message(msg)
+
+    print("✅ Email sent successfully")
 
 
 # ===============================
@@ -74,6 +90,8 @@ for legal review by Eluyefa Chambers on behalf of Mr Scott Iguma.
 @app.route("/submit", methods=["POST"])
 def submit_petition():
     try:
+        print("📩 Submission received")
+
         full_name = request.form.get("full_name")
         email = request.form.get("email")
         phone = request.form.get("phone")
@@ -82,16 +100,25 @@ def submit_petition():
         account_number = request.form.get("account_number")
 
         proofs = request.files.getlist("proof")
+        print(f"📂 Files uploaded: {len(proofs)}")
 
         if not full_name or not email or not phone or not payment_date or not proofs:
             return jsonify({"success": False, "error": "Missing required fields"}), 400
 
         saved_files = []
+
         for proof in proofs:
+            if proof.filename.strip() == "":
+                continue
+
             filename = f"{int(datetime.now().timestamp())}_{proof.filename}"
             path = os.path.join(UPLOAD_FOLDER, filename)
             proof.save(path)
-            saved_files.append({"path": path, "original_name": proof.filename})
+
+            saved_files.append({
+                "path": path,
+                "original_name": proof.filename
+            })
 
         send_email(
             data={
@@ -109,7 +136,7 @@ def submit_petition():
         return jsonify({"success": True})
 
     except Exception as e:
-        print("ERROR:", e)
+        print("❌ ERROR:", e)
         return jsonify({"success": False}), 500
 
 
