@@ -85,10 +85,10 @@ This form is provided for victims to submit details of payments made to
 <label>Date of Payment *</label>
 <input type="date" name="payment_date" required>
 
-<label>Account Name</label>
+<label>Account Name of TMT TRAVEL you paid to </label>
 <input type="text" name="account_name">
 
-<label>Account Number</label>
+<label>Account Number of TMT TRAVEL you paid to </label>
 <input type="text" name="account_number">
 
 <label>Upload Proof of Payment</label>
@@ -123,7 +123,7 @@ document.getElementById("petitionForm").addEventListener("submit", function(e) {
     const msg = document.getElementById("successMessage");
     msg.classList.remove("hidden");
     msg.innerHTML =
-      "<strong>Submission successful.</strong><br>Your allegation has been received for legal review.";
+      "<strong>Submission successful.</strong><br>Your petition details  has been received  by ELUYEFA CHAMBERS on behalf of MR SCOTT IGUMA the activist  and your petition is being currently  being reviewed.";
   }).catch(() => {
     alert("Submission failed. Please try again.");
   }).finally(() => {
